@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- Database 설정 -->
+	
+	<!-- DB 설정파일을 load -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:properties/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- DBMS(DataBase Management System) -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="initialSize" value="${jdbc.initialSize}"/>
+		<property name="maxActive" value="${jdbc.maxActive}"/>
+		<property name="minIdle" value="${jdbc.initialSize}"/>
+		<property name="maxWait" value="3000"/>
+		<property name="poolPreparedStatements" value="true"/>
+		<property name="maxOpenPreparedStatements" value="50"/>
+	</bean>
+	
+	<!-- mybatis 설정 -->
+	<!-- 앞전 모델 2에선 다오.java에서 sql = "select.." + psmt,excuteUpdate이런 걸로 db에 접근했는데 이젠 mybatis를 이용해 xml파일에서 db로 접근 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapperLocations" value="classpath:sqls/*.xml"/>
+	</bean>
+	<!-- 
+		SqlSession : SQL 명령을 수행하는데 필요한 메서드 제공 
+		SqlSessionFactory : SqlSession을 생성해서 제공 / DataSource를 참조하여 Mysql 서버와 Mybatis를 연결해주는 객체
+		SqlSessionFactoryBean : SqlSessionFactory를 spring에서 사용하기 위한 빈/ SqlSessionFactory를 생성해주는 클래스?
+								mybatis가 제공하는 인터페이스,
+								SqlSessionFactory의 openSession()메서드가 sqlSession을 생성해서 제공
+		SqlSessionTemplate : SQL 명령을 수행하는데 필요한 메서드 제공.thread-safe
+	-->
+	
+	<!-- sqlSession 취득 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"> <!-- sqlSession을 생성 -> MemberDaoImpl 파일에서 autowired를 이용해서 현재 파일서 생성? -->
+		<constructor-arg index="0" ref="sqlSessionFactory"/>
+		<constructor-arg index="1" value="SIMPLE"/>
+	</bean>
+	<!-- SqlSessionTemplate : Mybatis쿼리문을 수행해주는 역할,
+	                          DAO클래스에 직접 SqlSession객체를선언하고 @Autowired로 의존주입하여 쿼리문을 수행 하는 방식 
+	-->
+	
+	
+	<!-- jdbc 설정 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+</beans>
+
+
+
+
+
+
+

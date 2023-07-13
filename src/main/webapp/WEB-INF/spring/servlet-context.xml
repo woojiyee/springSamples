@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:mvc="http://www.springframework.org/schema/mvc"
+   xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- 아래 코드는 컨트롤러와 뷰를 사용하기 위한 기본적인 코드,
+	프론트 컨트롤러이기 때문에 공통으로 처리하는 작업들을 추가로 설정하여 사용 -->
+	
+	
+	
+	<!-- spring MVC annotation(주석문, 지시문)을 사용하기 위한 설정 -->
+	<context:annotation-config/>
+	
+	<!--  
+		ViewResolver 설정 ( Spring 기능? 중 하난 듯? 스프링과 관련 있음 )
+		뷰 영역 구현
+		컨트롤러는 최종적으로 결과를 출력할 뷰(HelloController에서 return하는 파일명 hello)와 뷰에 전달할 객체를 담고 있는 ModelAndView 객체(컨트롤러 메소드의 매개변수로 쓰며 뷰로 데이터 넘길 때 쓰는 Model)를 리턴한다.
+		DispatchServlet은 ViewResolver를 사용하여 결과를 출력할 View 객체를 구하고, 구한 View 객체를 이용하여 내용을 생성한다.
+		
+		JSP를 뷰 기술로 사용할 경우 아래와 같이 InternalResourceViewResolver 구현체를 빈으로 등록해주면 된다.
+		
+		( 괄호 안은 내 추측 )
+	-->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>	<!-- view 파일들(jsp, html)의 위치, prefix는 접두어 -->
+		<property name="suffix" value=".jsp"/>				<!-- view 파일의 확장자명, suffix 접미어란 의미래.. -->
+	</bean>
+	<!-- 이는 ViewResolver가 "/WEB-INF/views/뷰이름.jsp"를 뷰 JSP로 사용한다는 것을 의미
+		 즉, HelloController는 뷰 이름으로 "hello"를 리턴하므로,
+		 실제로 사용되는 뷰 파일은 "/WEB-INF/views/hello.jsp" 파일이 된다.
+		 이래서 컨트롤러 리턴값을 그냥 뷰파일명 스트링으로 반환했구나....
+	-->
+	
+	
+	<!-- 공통 팩키지 -->
+	<!-- 현재 우리가 만들어놓은 이 패키지만큼은 주요하게 다 인식하도록 -->
+	<!-- 자바공통파일 패키지 지정. 해당 패키지 안에서만 Annotation 명시 파일들이 사용 가능 -->
+	<context:component-scan base-package="ssg.com.a"/>
+	
+	<!-- ajax 사용허가 -->
+	<!-- ajax 사용허가 없이 그냥 쓰면 ajax의 error가 실행됨 -->  
+	<mvc:annotation-driven/>
+	
+	<!-- spring에서 처리할 수 없는 요청은 tomcat이 처리 -->  
+	<!-- 이 설정도 해야 ajax 사용 가능 -->   
+	<mvc:default-servlet-handler/>    
+</beans>
+
+
+
+
+
+
+
